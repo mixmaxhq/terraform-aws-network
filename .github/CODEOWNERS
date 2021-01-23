@@ -1,0 +1,6 @@
+# For information about semantics and syntax, please see
+# https://help.github.com/articles/about-codeowners/
+
+# For all files in this Terraform module, reach out to Ryan Tasson
+* @rtasson
+

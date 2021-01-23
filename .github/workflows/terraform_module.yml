@@ -1,0 +1,42 @@
+name: 'Terraform'
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+
+jobs:
+  terraform:
+    name: 'Terraform module testing workflow'
+    runs-on: ubuntu-latest
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+    
+    steps:
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 0.12.29
+        
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    # Checks that all Terraform configuration files adhere to a canonical format
+    - name: terraform fmt
+      run: terraform fmt -check
+
+# Validate configuration with tfsec (https://github.com/tfsec/tfsec#use-as-github-action)
+    - name: Terraform security scan
+      uses: triat/terraform-security-scan@v2.0.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    # Generates an execution plan for Terraform
+    - name: Statically validate simple example
+      run: terraform init && terraform validate
+      working-directory: ./examples/simple/
